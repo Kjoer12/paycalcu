@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kalkulator Gaji By Zidan</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --c0:#05050a;--c1:#0c0c16;--c2:#13131f;--c3:#1a1a2a;
+  --glass:rgba(255,255,255,0.04);--glass2:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --a1:#f97316;--a2:#fb923c;--a3:#fed7aa;
+  --a1g:rgba(249,115,22,0.15);--a1gs:rgba(249,115,22,0.06);
+  --green:#10b981;--greeng:rgba(16,185,129,0.12);
+  --blue:#3b82f6;--blueg:rgba(59,130,246,0.12);
+  --text:#f1ede8;--text2:#9d97a8;--text3:#605c6e;
+  --r:18px;--r2:14px;--r3:10px;
+}
+html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{
+  font-family:'DM Sans',sans-serif;background:var(--c0);color:var(--text);
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-start;padding:32px 16px 60px;position:relative;overflow-x:hidden;
+}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity:0.032;z-index:1;pointer-events:none;
+}
+.app{position:relative;z-index:2;width:100%;max-width:480px;animation:fadeUp .7s cubic-bezier(.16,1,.3,1) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+
+/* PILL */
+.top-pill{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.22);
+  border-radius:100px;padding:7px 16px 7px 10px;width:fit-content;
+  margin:0 auto 22px;animation:fadeUp .5s .1s both;
+}
+.pill-dot{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--a1),#fb923c);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 0 12px rgba(249,115,22,.5)}
+.pill-text{font-size:12px;font-weight:600;color:var(--a2);letter-spacing:.06em;text-transform:uppercase;font-family:'Syne',sans-serif}
+
+/* HERO */
+.hero{text-align:center;margin-bottom:28px;animation:fadeUp .5s .15s both}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(26px,7vw,40px);font-weight:800;line-height:1.1;letter-spacing:-0.03em;margin-bottom:10px}
+.hero h1 .line2{background:linear-gradient(90deg,var(--a1) 0%,#fb923c 50%,#fcd34d 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--text2);font-size:14px;font-weight:300;line-height:1.6;letter-spacing:.01em}
+
+/* CARD */
+.card{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);overflow:hidden;margin-bottom:14px;animation:fadeUp .5s .2s both}
+.card-inner{padding:22px 24px}
+
+/* SEC LABEL */
+.sec-label{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.sec-label-icon{width:26px;height:26px;border-radius:8px;background:var(--a1g);border:1px solid rgba(249,115,22,.2);display:flex;align-items:center;justify-content:center;font-size:13px}
+.sec-label-text{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;font-family:'Syne',sans-serif}
+
+.divider{height:1px;background:var(--border);margin:18px 0}
+
+/* FIELD */
+.field{margin-bottom:12px}
+.field:last-of-type{margin-bottom:0}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:7px;letter-spacing:.03em}
+.inp-wrap{position:relative}
+.inp-wrap input{
+  width:100%;background:var(--c2);border:1px solid var(--border);border-radius:var(--r2);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:400;
+  outline:none;transition:border-color .2s,box-shadow .2s,background .2s;
+  appearance:textfield;-moz-appearance:textfield;
+}
+.inp-wrap input::-webkit-inner-spin-button,.inp-wrap input::-webkit-outer-spin-button{-webkit-appearance:none}
+.inp-wrap input:focus{background:var(--c3);border-color:rgba(249,115,22,.45);box-shadow:0 0 0 3px rgba(249,115,22,.1),inset 0 1px 0 rgba(255,255,255,.04)}
+.inp-wrap input::placeholder{color:var(--text3)}
+.inp-wrap.ico-l input{padding:12px 14px 12px 44px}
+.inp-wrap.ico-rp input{padding:12px 14px 12px 72px}
+.inp-wrap:not(.ico-l):not(.ico-rp) input{padding:12px 16px}
+.inp-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none}
+.inp-rp{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  font-size:12px;font-weight:600;color:var(--text3);pointer-events:none;
+  background:var(--c3);border-right:1px solid var(--border);padding:4px 8px 4px 14px;
+  height:100%;display:flex;align-items:center;border-radius:var(--r2) 0 0 var(--r2);
+  transition:background .2s;
+}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* STEPPER */
+.step-btns{display:flex;position:absolute;right:4px;top:50%;transform:translateY(-50%);flex-direction:column;gap:1px}
+.step-btn{width:22px;height:18px;background:var(--c3);border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:9px;transition:background .15s,color .15s;user-select:none}
+.step-btn:hover{background:var(--a1g);color:var(--a2)}
+.inp-wrap.has-steps input{padding-right:34px}
+
+/* DAY TABS */
+.day-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.day-tab{
+  flex:1;min-width:52px;padding:8px 4px;
+  background:var(--c2);border:1px solid var(--border);border-radius:var(--r3);
+  color:var(--text3);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;
+  cursor:pointer;transition:all .18s;text-align:center;
+  position:relative;
+}
+.day-tab:hover{border-color:var(--border2);color:var(--text2)}
+.day-tab.active{background:var(--a1g);border-color:rgba(249,115,22,.4);color:var(--a2);font-weight:600}
+.day-tab.filled::after{
+  content:'✓';position:absolute;top:2px;right:4px;font-size:8px;color:var(--green);
+}
+.day-tab.active.filled::after{color:var(--a2)}
+
+/* DAY FORM */
+.day-form{display:none}
+.day-form.active{display:block}
+
+/* DAY HEADER inside form */
+.day-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.day-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--a2)}
+.day-badge{font-size:11px;color:var(--text3);background:var(--c2);border:1px solid var(--border);padding:3px 10px;border-radius:100px}
+
+/* NAV BTNS */
+.day-nav{display:flex;gap:8px;margin-top:16px}
+.btn-prev,.btn-next{
+  flex:1;padding:10px;border-radius:var(--r3);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--border);
+}
+.btn-prev{background:transparent;color:var(--text3)}
+.btn-prev:hover{color:var(--text2);border-color:var(--border2)}
+.btn-next{background:var(--a1g);border-color:rgba(249,115,22,.3);color:var(--a2)}
+.btn-next:hover{background:rgba(249,115,22,.22);border-color:rgba(249,115,22,.5)}
+.btn-next:disabled{opacity:.35;cursor:not-allowed}
+
+/* CTA */
+.cta-wrap{padding:0 24px 22px}
+.cta{
+  width:100%;padding:15px;background:linear-gradient(135deg,#ea6212 0%,#f97316 40%,#fb923c 100%);
+  border:none;border-radius:var(--r2);color:#fff;font-family:'Syne',sans-serif;
+  font-size:15px;font-weight:700;letter-spacing:.02em;cursor:pointer;
+  position:relative;overflow:hidden;
+  box-shadow:0 4px 24px rgba(249,115,22,.35),0 1px 0 rgba(255,255,255,.15) inset;
+  transition:transform .15s,box-shadow .2s;
+}
+.cta::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.18) 0%,transparent 55%);opacity:0;transition:opacity .2s}
+.cta:hover{transform:translateY(-2px);box-shadow:0 8px 36px rgba(249,115,22,.5),0 1px 0 rgba(255,255,255,.15) inset}
+.cta:hover::before{opacity:1}
+.cta:active{transform:translateY(0);box-shadow:0 2px 12px rgba(249,115,22,.3)}
+.cta-inner{display:flex;align-items:center;justify-content:center;gap:10px}
+.cta-arrow{width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:13px;transition:transform .2s}
+.cta:hover .cta-arrow{transform:translateX(3px)}
+
+/* RESULT */
+.result{display:none;background:var(--glass);border:1px solid var(--border);border-radius:var(--r);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);overflow:hidden;margin-bottom:14px}
+.result.show{display:block;animation:fadeUp .5s cubic-bezier(.16,1,.3,1) both}
+.res-banner{padding:18px 24px;background:linear-gradient(135deg,rgba(249,115,22,.1) 0%,rgba(251,146,60,.05) 100%);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px}
+.res-avatar{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--a1),var(--a2));display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 16px rgba(249,115,22,.4);flex-shrink:0}
+.res-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:2px}
+.res-sub{font-size:12px;color:var(--text2);font-weight:300}
+
+.res-body{padding:16px 24px;display:flex;flex-direction:column;gap:6px}
+
+/* DAY SUMMARY GROUP */
+.day-group{
+  background:var(--c2);border:1px solid var(--border);border-radius:var(--r3);overflow:hidden;margin-bottom:2px;
+}
+.day-group-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+}
+.day-group-title{font-size:12px;font-weight:700;color:var(--a2);font-family:'Syne',sans-serif;text-transform:capitalize}
+.day-group-total{font-size:12px;font-weight:600;color:var(--text2)}
+.day-group-rows{padding:8px 14px;display:flex;flex-direction:column;gap:4px}
+.dg-row{display:flex;justify-content:space-between;font-size:12px}
+.dg-lbl{color:var(--text3)}
+.dg-val{color:var(--text);font-weight:500}
+
+.res-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--c2);border:1px solid var(--border);border-radius:var(--r3);transition:border-color .2s}
+.res-row:hover{border-color:var(--border2)}
+.res-row-l{display:flex;align-items:center;gap:10px}
+.res-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--c3)}
+.res-lbl{font-size:13px;color:var(--text2);font-weight:400}
+.res-val{font-size:13px;font-weight:600;color:var(--text);letter-spacing:.01em}
+.res-row.total{background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(16,185,129,.04));border-color:rgba(16,185,129,.2);padding:15px 14px}
+.res-row.total .res-ico{background:var(--greeng);color:var(--green)}
+.res-row.total .res-lbl{color:rgba(16,185,129,.8);font-weight:500}
+.res-row.total .res-val{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;background:linear-gradient(90deg,var(--green),#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+.res-footer{padding:0 24px 20px;display:flex;flex-direction:column;gap:8px}
+.download{
+  width:100%;padding:11px;
+  background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(16,185,129,.06));
+  border:1px solid rgba(16,185,129,.25);border-radius:var(--r3);color:var(--green);
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.download:hover{background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(16,185,129,.1));border-color:rgba(16,185,129,.45);color:#34d399}
+.reset{
+  width:100%;padding:11px;background:transparent;border:1px solid var(--border);border-radius:var(--r3);
+  color:var(--text3);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.reset:hover{border-color:var(--border2);color:var(--text2)}
+
+/* PROGRESS BAR */
+.progress-wrap{margin-bottom:14px}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:6px}
+.progress-bar{height:4px;background:var(--c3);border-radius:100px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--a1),var(--a2));border-radius:100px;transition:width .4s cubic-bezier(.16,1,.3,1)}
+
+/* FOOT */
+.foot{text-align:center;font-size:11px;color:var(--text3);margin-top:6px;letter-spacing:.04em;animation:fadeUp .5s .3s both}
+
+/* ERROR */
+.inp-wrap input.err{border-color:rgba(239,68,68,.5)!important;animation:shake .35s both}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
+@media(max-width:380px){
+  .row2{grid-template-columns:1fr}
+  .card-inner,.res-body,.cta-wrap,.res-footer{padding-left:18px;padding-right:18px}
+  .res-banner{padding:14px 18px}
+  .day-tab{font-size:11px;padding:7px 2px}
+}
+@media(min-width:600px){.app{max-width:500px}}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="app">
+
+  <!-- PILL -->
+  <div class="top-pill">
+    <div class="pill-dot">💼</div>
+    <span class="pill-text">Kalkulator Gaji Karyawan</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>Hitung Gaji<br><span class="line2">Karyawan Kamu</span></h1>
+    <p>Input jam kerja tiap hari, otomatis dihitung total mingguan.</p>
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="card">
+    <div class="card-inner">
+
+      <!-- Employee info -->
+      <div class="sec-label">
+        <div class="sec-label-icon">👤</div>
+        <span class="sec-label-text">Data Karyawan</span>
+      </div>
+      <div class="field">
+        <label>Nama Lengkap</label>
+        <div class="inp-wrap ico-l">
+          <span class="inp-ico">✦</span>
+          <input type="text" id="nama" placeholder="Masukkan nama karyawan" autocomplete="off"/>
+        </div>
+      </div>
+      <div class="field">
+        <label>Gaji per Jam</label>
+        <div class="inp-wrap ico-rp">
+          <span class="inp-rp" id="rp-prefix">Rp</span>
+          <input type="number" id="gajiPerJam" placeholder="25.000" min="0"/>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Durasi Kerja per Hari -->
+      <div class="sec-label">
+        <div class="sec-label-icon">📅</div>
+        <span class="sec-label-text">Durasi Kerja per Hari</span>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span id="prog-text">0 dari 7 hari diisi</span>
+          <span id="prog-pct">0%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+      </div>
+
+      <!-- Day Tabs -->
+      <div class="day-tabs" id="day-tabs">
+        <div class="day-tab active" data-day="0" onclick="switchDay(0)">Sen</div>
+        <div class="day-tab" data-day="1" onclick="switchDay(1)">Sel</div>
+        <div class="day-tab" data-day="2" onclick="switchDay(2)">Rab</div>
+        <div class="day-tab" data-day="3" onclick="switchDay(3)">Kam</div>
+        <div class="day-tab" data-day="4" onclick="switchDay(4)">Jum</div>
+        <div class="day-tab" data-day="5" onclick="switchDay(5)">Sab</div>
+        <div class="day-tab" data-day="6" onclick="switchDay(6)">Min</div>
+      </div>
+
+      <!-- Day Forms -->
+      <div id="day-forms">
+        <!-- Generated by JS -->
+      </div>
+
+    </div>
+    <div class="cta-wrap">
+      <button class="cta" onclick="hitungGaji()">
+        <div class="cta-inner">
+          <span>Hitung Total Gaji Minggu Ini</span>
+          <div class="cta-arrow">→</div>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result" id="result">
+    <div class="res-banner">
+      <div class="res-avatar">💼</div>
+      <div>
+        <div class="res-name" id="r-nama">—</div>
+        <div class="res-sub">Rekap gaji mingguan</div>
+      </div>
+    </div>
+    <div class="res-body" id="res-body">
+      <!-- Generated by JS -->
+    </div>
+    <div class="res-footer">
+      <button class="download" onclick="downloadLaporan()">
+        <span>⬇</span><span>Download Laporan (.txt)</span>
+      </button>
+      <button class="reset" onclick="resetForm()">
+        <span>↩</span><span>Hitung Ulang</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="foot">PayCalc · © 2026 · Dibuat oleh zidan dengan ❤️</div>
+</div>
+
+<script>
+/* ── ANIMATED BACKGROUND ───────── */
+(function(){
+  const c=document.getElementById('bg-canvas');
+  const ctx=c.getContext('2d');
+  let W,H,orbs;
+  function init(){
+    W=c.width=window.innerWidth;H=c.height=window.innerHeight;
+    orbs=[
+      {x:W*.75,y:H*.15,r:420,dx:.18,dy:.12,col:'rgba(249,115,22,'},
+      {x:W*.2,y:H*.8,r:340,dx:-.14,dy:-.1,col:'rgba(16,185,129,'},
+      {x:W*.5,y:H*.5,r:280,dx:.1,dy:.16,col:'rgba(251,146,60,'},
+    ];
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    orbs.forEach(o=>{
+      const g=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r);
+      g.addColorStop(0,o.col+'0.07)');g.addColorStop(1,o.col+'0)');
+      ctx.beginPath();ctx.arc(o.x,o.y,o.r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+      o.x+=o.dx;o.y+=o.dy;
+      if(o.x<-o.r||o.x>W+o.r)o.dx*=-1;if(o.y<-o.r||o.y>H+o.r)o.dy*=-1;
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',init);init();draw();
+})();
+
+/* ── CONSTANTS ───────── */
+const HARI = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+const HARI_SHORT = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+let currentDay = 0;
+
+/* ── BUILD DAY FORMS ───────── */
+(function buildForms(){
+  const container = document.getElementById('day-forms');
+  HARI.forEach((h,i)=>{
+    container.innerHTML += `
+    <div class="day-form${i===0?' active':''}" id="form-day-${i}">
+      <div class="day-header">
+        <span class="day-title">Hari ${h}</span>
+        <span class="day-badge" id="badge-${i}">Belum diisi</span>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Jam Kerja</label>
+          <div class="inp-wrap ico-l has-steps">
+            <span class="inp-ico" style="font-size:13px">🕐</span>
+            <input type="number" id="jam-${i}" placeholder="0" min="0" max="24" oninput="onDayInput(${i})"/>
+            <div class="step-btns">
+              <div class="step-btn" onclick="stepDay(${i},'jam',1)">▲</div>
+              <div class="step-btn" onclick="stepDay(${i},'jam',-1)">▼</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Menit Kerja</label>
+          <div class="inp-wrap ico-l has-steps">
+            <span class="inp-ico" style="font-size:13px">⏲</span>
+            <input type="number" id="menit-${i}" placeholder="0" min="0" max="59" oninput="onDayInput(${i})"/>
+            <div class="step-btns">
+              <div class="step-btn" onclick="stepDay(${i},'menit',1)">▲</div>
+              <div class="step-btn" onclick="stepDay(${i},'menit',-1)">▼</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="day-nav">
+        ${i>0?`<button class="btn-prev" onclick="switchDay(${i-1})">← ${HARI_SHORT[i-1]}</button>`:'<div></div>'}
+        ${i<6?`<button class="btn-next" onclick="switchDay(${i+1})">${HARI_SHORT[i+1]} →</button>`:''}
+      </div>
+    </div>`;
+  });
+})();
+
+/* ── SWITCH DAY ───────── */
+function switchDay(idx){
+  currentDay = idx;
+  document.querySelectorAll('.day-form').forEach((f,i)=>f.classList.toggle('active',i===idx));
+  document.querySelectorAll('.day-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+}
+
+/* ── STEPPER ───────── */
+function stepDay(dayIdx, type, delta){
+  const id = type==='jam' ? `jam-${dayIdx}` : `menit-${dayIdx}`;
+  const el = document.getElementById(id);
+  let v = (parseFloat(el.value)||0) + delta;
+  if(type==='menit') v=Math.max(0,Math.min(59,v));
+  else v=Math.max(0,v);
+  el.value = v;
+  onDayInput(dayIdx);
+}
+
+/* ── ON DAY INPUT ───────── */
+function onDayInput(idx){
+  const jam = parseFloat(document.getElementById(`jam-${idx}`).value)||0;
+  const menit = parseFloat(document.getElementById(`menit-${idx}`).value)||0;
+  const filled = jam>0||menit>0;
+  const tab = document.querySelector(`.day-tab[data-day="${idx}"]`);
+  const badge = document.getElementById(`badge-${idx}`);
+  tab.classList.toggle('filled', filled);
+  if(filled){
+    badge.textContent = `${jam}j ${menit}m`;
+    badge.style.color = 'var(--green)';
+    badge.style.borderColor = 'rgba(16,185,129,.3)';
+  } else {
+    badge.textContent = 'Belum diisi';
+    badge.style.color = '';
+    badge.style.borderColor = '';
+  }
+  updateProgress();
+}
+
+/* ── PROGRESS ───────── */
+function updateProgress(){
+  let filled=0;
+  for(let i=0;i<7;i++){
+    const jam=parseFloat(document.getElementById(`jam-${i}`).value)||0;
+    const menit=parseFloat(document.getElementById(`menit-${i}`).value)||0;
+    if(jam>0||menit>0) filled++;
+  }
+  document.getElementById('prog-text').textContent=`${filled} dari 7 hari diisi`;
+  const pct=Math.round(filled/7*100);
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('prog-fill').style.width=pct+'%';
+}
+
+/* ── FORMAT ───────── */
+function fmt(n){return'Rp '+n.toLocaleString('id-ID',{minimumFractionDigits:0,maximumFractionDigits:0})}
+
+/* ── HITUNG ───────── */
+let _lastData = null;
+
+function hitungGaji(){
+  const nama = document.getElementById('nama').value.trim();
+  const gaji = parseFloat(document.getElementById('gajiPerJam').value)||0;
+
+  let ok=true;
+  if(!nama){errShake('nama');ok=false}
+  if(!gaji){errShake('gajiPerJam');ok=false}
+  if(!ok) return;
+
+  const days=[];
+  let totalJamAll=0;
+
+  for(let i=0;i<7;i++){
+    const jam=parseFloat(document.getElementById(`jam-${i}`).value)||0;
+    const menit=parseFloat(document.getElementById(`menit-${i}`).value)||0;
+    const totalJam=jam+(menit/60);
+    totalJamAll+=totalJam;
+    days.push({hari:HARI[i],jam,menit,totalJam});
+  }
+
+  const total=totalJamAll*gaji;
+  _lastData={nama,gaji,days,totalJamAll,total};
+
+  // Build result UI
+  document.getElementById('r-nama').textContent=nama;
+  const body=document.getElementById('res-body');
+  body.innerHTML='';
+
+  days.forEach(d=>{
+    if(d.jam===0&&d.menit===0) return; // skip kosong
+    const g=document.createElement('div');
+    g.className='day-group';
+    const jamTxt=`${d.jam} jam ${d.menit} menit`;
+    const desimalTxt=d.totalJam.toFixed(2)+' jam';
+    const gajiHari=fmt(d.totalJam*gaji);
+    g.innerHTML=`
+      <div class="day-group-header">
+        <span class="day-group-title">Hari ${d.hari}</span>
+        <span class="day-group-total">${gajiHari}</span>
+      </div>
+      <div class="day-group-rows">
+        <div class="dg-row"><span class="dg-lbl">Waktu Kerja</span><span class="dg-val">${jamTxt}</span></div>
+        <div class="dg-row"><span class="dg-lbl">Total Jam</span><span class="dg-val">${desimalTxt}</span></div>
+      </div>`;
+    body.appendChild(g);
+  });
+
+  // Tarif row
+  const tarifRow=document.createElement('div');
+  tarifRow.className='res-row';
+  tarifRow.innerHTML=`<div class="res-row-l"><div class="res-ico">💵</div><span class="res-lbl">Tarif per Jam</span></div><span class="res-val">${fmt(gaji)} / jam</span>`;
+  body.appendChild(tarifRow);
+
+  // Total row
+  const totalRow=document.createElement('div');
+  totalRow.className='res-row total';
+  totalRow.innerHTML=`<div class="res-row-l"><div class="res-ico">💰</div><span class="res-lbl">Total Gaji Bersih</span></div><span class="res-val">${fmt(total)}</span>`;
+  body.appendChild(totalRow);
+
+  const res=document.getElementById('result');
+  res.classList.remove('show');void res.offsetWidth;res.classList.add('show');
+  setTimeout(()=>res.scrollIntoView({behavior:'smooth',block:'nearest'}),80);
+}
+
+/* ── DOWNLOAD ───────── */
+function downloadLaporan(){
+  if(!_lastData) return;
+  const {nama,gaji,days,total}=_lastData;
+
+  const now=new Date();
+  const tgl=`${String(now.getDate()).padStart(2,'0')}/${now.getMonth()+1}/${now.getFullYear()}`;
+  const jam2=String(now.getHours()).padStart(2,'0');
+  const min2=String(now.getMinutes()).padStart(2,'0');
+  const dtk2=String(now.getSeconds()).padStart(2,'0');
+  const waktuCetak=`${tgl}, ${jam2}.${min2}.${dtk2}`;
+  const fmtP=n=>'Rp '+n.toLocaleString('id-ID',{minimumFractionDigits:0,maximumFractionDigits:0});
+
+  let hariLines='';
+  days.forEach(d=>{
+    if(d.jam===0&&d.menit===0) return;
+    hariLines+=`Hari ${d.hari}\n`;
+    hariLines+=`Waktu Kerja   : ${d.jam} jam ${d.menit} menit\n`;
+    hariLines+=`Total Jam     : ${d.totalJam.toFixed(2)} jam\n\n`;
+  });
+
+  const isi=
+`====================================
+       LAPORAN GAJI KARYAWAN
+====================================
+
+Nama Karyawan : ${nama}
+
+${hariLines}Tarif per Jam : ${fmtP(gaji)} / jam
+
+------------------------------------
+TOTAL GAJI    : ${fmtP(total)}
+------------------------------------
+
+Dicetak pada :
+${waktuCetak}
+
+====================================
+Gaji Minggu Ini
+====================================`;
+
+  const blob=new Blob([isi],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=nama.replace(/\s+/g,'_')+'.txt';
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
+/* ── ERROR SHAKE ───────── */
+function errShake(id){
+  const el=document.getElementById(id);
+  el.classList.remove('err');void el.offsetWidth;el.classList.add('err');
+  setTimeout(()=>el.classList.remove('err'),700);el.focus();
+}
+
+/* ── RESET ───────── */
+function resetForm(){
+  document.getElementById('nama').value='';
+  document.getElementById('gajiPerJam').value='';
+  for(let i=0;i<7;i++){
+    document.getElementById(`jam-${i}`).value='';
+    document.getElementById(`menit-${i}`).value='';
+    const tab=document.querySelector(`.day-tab[data-day="${i}"]`);
+    tab.classList.remove('filled');
+    const badge=document.getElementById(`badge-${i}`);
+    badge.textContent='Belum diisi';badge.style.color='';badge.style.borderColor='';
+  }
+  document.getElementById('result').classList.remove('show');
+  updateProgress();
+  switchDay(0);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ── RP PREFIX SYNC ───────── */
+document.getElementById('gajiPerJam').addEventListener('focus',()=>{
+  document.getElementById('rp-prefix').style.background='var(--c3)';
+});
+</script>
+</body>
+</html>
